@@ -703,7 +703,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                                 <i class="fa-solid fa-list text-blue-500"></i> <?= __('recent_visits') ?>
                             </h3>
                             <span class="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full font-bold">
-                                <?= count($recent_visits) ?> رکورد
+                                <?= count($recent_visits) ?> <?= __('records') ?>
                             </span>
                         </div>
                         <div class="flex-1 overflow-auto custom-scrollbar p-0">
