@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* تعریف فونت یکان بخ به صورت محلی */
+@font-face {
+  font-family: 'Yekan Bakh FaNum';
+  src: url('../fonts/YekanBakh/Yekan-Bakh-FaNum-04-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yekan Bakh FaNum';
+  src: url('../fonts/YekanBakh/Yekan-Bakh-FaNum-05-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yekan Bakh FaNum';
+  src: url('../fonts/YekanBakh/Yekan-Bakh-FaNum-06-Bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yekan Bakh FaNum';
+  src: url('../fonts/YekanBakh/Yekan-Bakh-FaNum-07-Heavy.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yekan Bakh FaNum';
+  src: url('../fonts/YekanBakh/Yekan-Bakh-FaNum-08-Fat.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* استایل‌های عمومی بدنه */
+body {
+    font-family: 'Yekan Bakh FaNum', sans-serif;
+    background-color: #FAFAFA; /* رنگ پس‌زمینه بسیار روشن و تمیز */
+    color: #1F2937;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* انیمیشن‌های سفارشی برای جذابیت بصری */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.blob {
+    position: absolute;
+    filter: blur(60px);
+    z-index: -1;
+    opacity: 0.4;
+    animation: moveBlob 15s infinite alternate ease-in-out;
+}
+
+@keyframes moveBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(50px, -50px) scale(1.1); }
+    100% { transform: translate(-50px, 50px) scale(0.9); }
+}
+
+/* استایل اختصاصی برای کارت‌های خدمات */
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px -10px rgba(22, 163, 74, 0.2);
+}
+
+.service-icon-wrapper {
+    transition: all 0.3s ease;
+}
+
+.service-card:hover .service-icon-wrapper {
+    background-color: #16A34A;
+    color: white;
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* دکمه‌های جذاب */
+.btn-cta {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.btn-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+.btn-cta:hover::before {
+    width: 100%;
+}
+
+/* پترن پس‌زمینه لطیف */
+.bg-pattern {
+    background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
+    background-size: 20px 20px;
+}

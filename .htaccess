@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# ۱. حذف پسوند .html از آدرس صفحات
+# اگر درخواستی برای صفحه‌ای بدون پسوند فرستاده شد و فایل .html آن وجود داشت، آن را لود کن
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# ۲. مشخص کردن صفحه اصلی پوشه
+# به طور پیش‌فرض، اگر فقط نام پوشه وارد شد (مانند hom-plus.ir/landings)، صفحه index.html لود شود
+DirectoryIndex index.html
+</IfModule>

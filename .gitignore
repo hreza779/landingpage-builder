@@ -1,0 +1,29 @@
+# Database files (SQLite)
+/data/*.sqlite
+/data/*.db
+/data/*.sqlite3
+
+# Uploaded Media Files
+/assets/uploads/*
+!/assets/uploads/.htaccess
+!/assets/uploads/.gitkeep
+/assets/images/*
+!/assets/images/.htaccess
+!/assets/images/.gitkeep
+
+# MacOS System Files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
