@@ -59,6 +59,7 @@ $i18n = [
         'col_actions' => 'Actions',
         'edit' => 'Edit',
         'copy_link' => 'Copy Link',
+        'copy_source_link' => 'Copy Link (Source)',
         'view' => 'View',
         'no_html_files' => 'No HTML files found!',
         'leads_list' => 'Leads & Forms List',
@@ -145,6 +146,7 @@ $i18n = [
         'col_actions' => 'عملیات',
         'edit' => 'ویرایش',
         'copy_link' => 'کپی لینک',
+        'copy_source_link' => 'کپی لینک (لینک برای سورس کپی می‌شود)',
         'view' => 'مشاهده',
         'no_html_files' => 'هیچ فایل HTML در این پوشه یافت نشد!',
         'leads_list' => 'لیست درخواست‌ها و سرنخ‌ها (Leads)',
@@ -992,7 +994,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                                     
                                     <!-- Hover Overlay -->
                                     <div class="absolute inset-0 bg-gray-900/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                                        <button type="button" onclick="copyToClipboard('<?= $abs_url ?>', this, true)" class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors" title="کپی لینک (لینک برای سورس کپی می‌شود)">
+                                        <button type="button" onclick="copyToClipboard('<?= $abs_url ?>', this, true)" class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors" title="<?= __('copy_source_link') ?>">
                                             <i class="fa-solid fa-link"></i>
                                         </button>
                                         <form method="POST" class="m-0" onsubmit="return confirm('<?= __('confirm_del') ?>')">
@@ -1068,7 +1070,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                 const originalHtml = btnElement.innerHTML;
                 btnElement.innerHTML = '<i class="fa-solid fa-check"></i>';
                 btnElement.classList.add(isMedia ? 'bg-green-500' : 'bg-green-50', isMedia ? 'text-white' : 'text-green-600');
-                if(!isMedia) btnElement.innerHTML += ' کپی شد';
+                if(!isMedia) btnElement.innerHTML += ' ' + '<?= __(\'copied\') ?>';
                 
                 setTimeout(() => {
                     btnElement.innerHTML = originalHtml;
