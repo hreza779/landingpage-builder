@@ -43,6 +43,7 @@ $i18n = [
         'no_data' => 'No data found.',
         'recent_visits' => 'Recent Visits',
         'records' => 'Records',
+        'no_visits' => 'No visits found.',
         'col_page_time' => 'Page / Time',
         'col_traffic' => 'Traffic (UTM)',
         'col_referrer' => 'Referrer',
@@ -128,6 +129,7 @@ $i18n = [
         'no_data' => 'دیتا یافت نشد.',
         'recent_visits' => 'لیست بازدیدها',
         'records' => 'رکورد',
+        'no_visits' => '<?= __('no_visits') ?>',
         'col_page_time' => 'صفحه / زمان',
         'col_traffic' => 'ترافیک (UTM)',
         'col_referrer' => 'ارجاع‌دهنده',
@@ -755,7 +757,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                                         </tr>
                                     <?php endforeach; ?>
                                     <?php if(empty($recent_visits)): ?>
-                                        <tr><td colspan="5" class="py-8 text-center text-gray-400">بازدیدی یافت نشد.</td></tr>
+                                        <tr><td colspan="5" class="py-8 text-center text-gray-400"><?= __('no_visits') ?></td></tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
