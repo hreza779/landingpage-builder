@@ -57,6 +57,20 @@ try {
         try { $pdo->exec("ALTER TABLE leads ADD COLUMN $c TEXT"); } catch (Exception $e) {}
     }
 
+    try { $pdo->exec("ALTER TABLE visits ADD COLUMN is_bounced INTEGER DEFAULT 1"); } catch (Exception $e) {}
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        visit_id INTEGER,
+        page TEXT,
+        clicks TEXT,
+        max_scroll INTEGER DEFAULT 0,
+        duration INTEGER DEFAULT 0,
+        screen_w INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )");
+    try { $pdo->exec("ALTER TABLE sessions ADD COLUMN screen_w INTEGER DEFAULT 0"); } catch (Exception $e) {}
+
     $pdo->exec("DELETE FROM visits WHERE page = 'srcdoc' OR page = 'about:srcdoc' OR page = ''");
 
     $input = json_decode(file_get_contents('php://input'), true);
@@ -67,6 +81,37 @@ try {
 
         if ($page === 'srcdoc' || $page === 'about:srcdoc') {
             echo json_encode(['status' => 'ignored_preview']);
+            exit;
+        }
+
+        if ($action === 'session') {
+            $visit_id = intval($input['visit_id'] ?? 0);
+            $clicks   = json_encode($input['clicks'] ?? []);
+            $max_scroll = intval($input['max_scroll'] ?? 0);
+            $duration   = intval($input['duration'] ?? 0);
+            $screen_w   = intval($input['screen_w'] ?? 0);
+            // Get page from visits table
+            $page_row = $pdo->prepare("SELECT page FROM visits WHERE id = ?");
+            $page_row->execute([$visit_id]);
+            $p = $page_row->fetchColumn() ?: '';
+            // Only insert if not already recorded for this visit
+            $existing = $pdo->prepare("SELECT id FROM sessions WHERE visit_id = ?");
+            $existing->execute([$visit_id]);
+            if (!$existing->fetchColumn()) {
+                $stmt = $pdo->prepare("INSERT INTO sessions (visit_id, page, clicks, max_scroll, duration, screen_w) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$visit_id, $p, $clicks, $max_scroll, $duration, $screen_w]);
+            }
+            echo json_encode(['status' => 'success_session']);
+            exit;
+        }
+
+        if ($action === 'ping') {
+            $visit_id = $input['visit_id'] ?? null;
+            if ($visit_id) {
+                $stmt = $pdo->prepare("UPDATE visits SET is_bounced = 0 WHERE id = ?");
+                $stmt->execute([$visit_id]);
+            }
+            echo json_encode(['status' => 'success_ping']);
             exit;
         }
 
@@ -95,7 +140,7 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO visits (page, utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, ip, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO visits (page, utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, ip, user_agent, is_bounced) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
         $stmt->execute([
             $page,
             $input['utm_source'] ?? '',
@@ -108,7 +153,9 @@ try {
             $_SERVER['HTTP_USER_AGENT'] ?? ''
         ]);
         
-        echo json_encode(['status' => 'success']);
+        $visit_id = $pdo->lastInsertId();
+        
+        echo json_encode(['status' => 'success', 'visit_id' => $visit_id]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'No data received']);
     }

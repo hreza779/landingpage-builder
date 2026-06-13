@@ -94,6 +94,7 @@
     <!-- Tracking Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            if (window.location.search.indexOf("preview=1") !== -1) return;
             try {
                 // 1. استخراج نام صفحه و پارامترهای UTM
                 const urlParams = new URLSearchParams(window.location.search);
@@ -112,7 +113,7 @@
                     utm_content: urlParams.get('utm_content') || '', 
                     referrer: document.referrer || '' 
                 };
-                fetch('tracker.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(trackingData) }).catch(e => console.log(e));
+                fetch('tracker.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(trackingData) }).then(r=>r.json()).then(r => { if(r.visit_id) { window.__visitId = r.visit_id; setTimeout(() => { fetch('tracker.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({action: 'ping', visit_id: r.visit_id}) }); }, 4000); } }).catch(e=>console.log(e));
 
                 // 3. رهگیری تمام فرم‌های صفحه به صورت جادویی
                 document.querySelectorAll('form').forEach(form => {
@@ -167,5 +168,6 @@
             }
         });
     </script>
+<script src="recorder.js"></script>
 </body>
 </html>

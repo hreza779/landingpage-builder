@@ -130,7 +130,7 @@ $i18n = [
         'no_data' => 'دیتا یافت نشد.',
         'recent_visits' => 'لیست بازدیدها',
         'records' => 'رکورد',
-        'no_visits' => '<?= __('no_visits') ?>',
+        'no_visits' => 'هیچ بازدیدی یافت نشد.',
         'col_page_time' => 'صفحه / زمان',
         'col_traffic' => 'ترافیک (UTM)',
         'col_referrer' => 'ارجاع‌دهنده',
@@ -295,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $b_lang = $lang;
                 $b_dir = $dir;
 
-                $boilerplate = "<!DOCTYPE html>\n<html lang=\"{$b_lang}\" dir=\"{$b_dir}\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>{$b_title}</title>\n    <link rel=\"stylesheet\" href=\"assets/css/font-awesome.min.css\">\n    <link rel=\"stylesheet\" href=\"assets/css/style.min.css\">\n</head>\n<body class=\"antialiased text-gray-800 bg-gray-50\">\n\n    <div class=\"container mx-auto px-4 py-20 text-center\">\n        <h1 class=\"text-4xl font-black text-primary mb-4\">{$b_welcome}</h1>\n        <p class=\"text-gray-600\">{$b_desc}</p>\n    </div>\n\n    <script>\n        document.addEventListener(\"DOMContentLoaded\", function() {\n            try {\n                const urlParams = new URLSearchParams(window.location.search);\n                let pageName = window.location.pathname.split('/').pop() || 'index';\n                if (pageName.endsWith('.html')) pageName = pageName.slice(0, -5);\n                if (pageName === '') pageName = 'index';\n\n                const trackingData = { action: 'visit', page: pageName, utm_source: urlParams.get('utm_source') || '', utm_medium: urlParams.get('utm_medium') || '', utm_campaign: urlParams.get('utm_campaign') || '', utm_term: urlParams.get('utm_term') || '', utm_content: urlParams.get('utm_content') || '', referrer: document.referrer || '' };\n                fetch('tracker.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(trackingData) }).catch(e=>console.log(e));\n\n                document.querySelectorAll('form').forEach(form => {\n                    form.addEventListener('submit', function(e) {\n                        e.preventDefault();\n                        const fd = new FormData(form); const d = {}; fd.forEach((v, k) => d[k] = v);\n                        const name = d.name || d.fullname || d.first_name || '';\n                        const phone = d.phone || d.mobile || d.tel || '';\n                        delete d.name; delete d.fullname; delete d.first_name; delete d.phone; delete d.mobile; delete d.tel;\n                        const btn = form.querySelector('button[type=\"submit\"]'); const ob = btn ? btn.innerHTML : '';\n                        if(btn) { btn.innerHTML = '{$b_sending}'; btn.disabled = true; }\n                        fetch('tracker.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'lead', page: pageName, name: name, phone: phone, details: JSON.stringify(d), utm_source: urlParams.get('utm_source')||'', utm_medium: urlParams.get('utm_medium')||'', utm_campaign: urlParams.get('utm_campaign')||'', utm_term: urlParams.get('utm_term')||'', utm_content: urlParams.get('utm_content')||''}) })\n                        .then(r => r.json()).then(r => { form.innerHTML = '<div style=\"padding:20px;background:#dcfce7;color:#166534;border-radius:8px;text-align:center;font-weight:bold;\">{$b_success}</div>'; })\n                        .catch(e => { if(btn) { btn.innerHTML = ob; btn.disabled = false; } alert('{$b_error}'); });\n                    });\n                });\n            } catch (error) {}\n        });\n    </script>\n</body>\n</html>";
+                $boilerplate = "<!DOCTYPE html>\n<html lang=\"{$b_lang}\" dir=\"{$b_dir}\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>{$b_title}</title>\n    <link rel=\"stylesheet\" href=\"assets/css/font-awesome.min.css\">\n    <link rel=\"stylesheet\" href=\"assets/css/style.min.css\">\n</head>\n<body class=\"antialiased text-gray-800 bg-gray-50\">\n\n    <div class=\"container mx-auto px-4 py-20 text-center\">\n        <h1 class=\"text-4xl font-black text-primary mb-4\">{$b_welcome}</h1>\n        <p class=\"text-gray-600\">{$b_desc}</p>\n    </div>\n\n    <script>\n        document.addEventListener(\"DOMContentLoaded\", function() {\n            try {\n                const urlParams = new URLSearchParams(window.location.search);\n                let pageName = window.location.pathname.split('/').pop() || 'index';\n                if (pageName.endsWith('.html')) pageName = pageName.slice(0, -5);\n                if (pageName === '') pageName = 'index';\n\n                const trackingData = { action: 'visit', page: pageName, utm_source: urlParams.get('utm_source') || '', utm_medium: urlParams.get('utm_medium') || '', utm_campaign: urlParams.get('utm_campaign') || '', utm_term: urlParams.get('utm_term') || '', utm_content: urlParams.get('utm_content') || '', referrer: document.referrer || '' };\n                fetch('tracker.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(trackingData) }).then(r=>r.json()).then(r => { if(r.visit_id) { setTimeout(() => { fetch('tracker.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({action: 'ping', visit_id: r.visit_id}) }); }, 4000); } }).catch(e=>console.log(e));\n\n                document.querySelectorAll('form').forEach(form => {\n                    form.addEventListener('submit', function(e) {\n                        e.preventDefault();\n                        const fd = new FormData(form); const d = {}; fd.forEach((v, k) => d[k] = v);\n                        const name = d.name || d.fullname || d.first_name || '';\n                        const phone = d.phone || d.mobile || d.tel || '';\n                        delete d.name; delete d.fullname; delete d.first_name; delete d.phone; delete d.mobile; delete d.tel;\n                        const btn = form.querySelector('button[type=\"submit\"]'); const ob = btn ? btn.innerHTML : '';\n                        if(btn) { btn.innerHTML = '{$b_sending}'; btn.disabled = true; }\n                        fetch('tracker.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({action: 'lead', page: pageName, name: name, phone: phone, details: JSON.stringify(d), utm_source: urlParams.get('utm_source')||'', utm_medium: urlParams.get('utm_medium')||'', utm_campaign: urlParams.get('utm_campaign')||'', utm_term: urlParams.get('utm_term')||'', utm_content: urlParams.get('utm_content')||''}) })\n                        .then(r => r.json()).then(r => { form.innerHTML = '<div style=\"padding:20px;background:#dcfce7;color:#166534;border-radius:8px;text-align:center;font-weight:bold;\">{$b_success}</div>'; })\n                        .catch(e => { if(btn) { btn.innerHTML = ob; btn.disabled = false; } alert('{$b_error}'); });\n                    });\n                });\n            } catch (error) {}\n        });\n    </script>\n</body>\n</html>";
                 file_put_contents($filepath, $boilerplate);
                 header("Location: editor.php?file=" . urlencode($new_file));
                 exit;
@@ -353,12 +353,118 @@ $recent_visits = [];
 $top_sources = [];
 $pages_db_stats = [];
 $mobile_pct = 0;
+$bounce_rate = 0;
 $all_pages = [];
 
 if (file_exists($db_file)) {
     try {
         $pdo = new PDO('sqlite:' . $db_file);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        try { $pdo->exec("ALTER TABLE visits ADD COLUMN is_bounced INTEGER DEFAULT 1"); } catch (Exception $e) {}
+
+        if (isset($_GET['heatmap_view'])) {
+            $vid = intval($_GET['heatmap_view']);
+            $stmt = $pdo->prepare("SELECT s.*, v.page FROM sessions s JOIN visits v ON s.visit_id = v.id WHERE s.visit_id = ?");
+            $stmt->execute([$vid]);
+            $session = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($session) {
+                $page = $session['page'];
+                $s_json = json_encode([
+                    'clicks' => json_decode($session['clicks'], true) ?: [],
+                    'max_scroll' => (int)$session['max_scroll'],
+                    'duration' => (int)$session['duration'],
+                    'screen_w' => (int)($session['screen_w'] ?? 0)
+                ]);
+                ?>
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Heatmap Viewer — <?= htmlspecialchars($page) ?></title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                </head>
+                <body class="bg-gray-900 h-screen flex flex-col overflow-hidden">
+                    <div class="p-4 bg-gray-800 text-white flex justify-between items-center shadow-md z-20 shrink-0">
+                        <div class="flex items-center gap-4">
+                            <button onclick="window.close()" class="w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center transition-colors">
+                                <i class="fa fa-arrow-left"></i>
+                            </button>
+                            <div>
+                                <h1 class="text-lg font-bold">Click Heatmap — <?= htmlspecialchars($page) ?></h1>
+                                <p class="text-xs text-gray-400">
+                                    <?= count(json_decode($session['clicks'], true) ?: []) ?> clicks recorded 
+                                    | Max scroll: <?= $session['max_scroll'] ?>% 
+                                    | Duration: <?= $session['duration'] ?>s
+                                    <?php if(($session['screen_w'] ?? 0) > 0): ?>| Screen: <?= $session['screen_w'] ?>px<?php endif; ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-auto bg-gray-100">
+                        <iframe id="heatmap-iframe" src="<?= ($page === 'index' || $page === '' ? 'index.html' : htmlspecialchars($page).'.html') ?>?preview=1" style="width:100%; height:100%; border:none; display:block;"></iframe>
+                    </div>
+                    <script>
+                        const s = <?= $s_json ?>;
+                        const iframe = document.getElementById('heatmap-iframe');
+                        
+                        iframe.onload = function() {
+                            try {
+                                var doc = iframe.contentWindow.document;
+                                
+                                // Inject overlay + dots directly into the iframe DOM
+                                var overlay = doc.createElement('div');
+                                overlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:99999; pointer-events:none;';
+                                doc.body.style.position = 'relative';
+                                doc.body.appendChild(overlay);
+                                
+                                // Scroll depth line
+                                if (s.max_scroll > 0) {
+                                    var scrollH = Math.max(doc.body.scrollHeight, doc.documentElement.scrollHeight);
+                                    var sy = (s.max_scroll / 100) * scrollH;
+                                    var line = doc.createElement('div');
+                                    line.style.cssText = 'position:absolute; left:0; width:100%; height:0; border-top:2px dashed rgba(239,68,68,0.8); z-index:100001; pointer-events:none;';
+                                    line.style.top = sy + 'px';
+                                    var label = doc.createElement('span');
+                                    label.style.cssText = 'position:absolute; top:-20px; left:10px; background:rgba(239,68,68,0.9); color:#fff; font-size:11px; padding:2px 8px; border-radius:4px; font-family:sans-serif;';
+                                    label.textContent = 'Max Scroll: ' + s.max_scroll + '%';
+                                    line.appendChild(label);
+                                    doc.body.appendChild(line);
+                                }
+                                
+                                // Inject click dots at absolute positions
+                                s.clicks.forEach(function(click) {
+                                    var x = click[0];
+                                    var y = click[1];
+                                    
+                                    // Outer glow
+                                    var glow = doc.createElement('div');
+                                    glow.style.cssText = 'position:absolute; pointer-events:none; z-index:100000; border-radius:50%; width:60px; height:60px; background:radial-gradient(circle, rgba(239,68,68,0.7) 0%, rgba(251,146,60,0.3) 40%, transparent 70%);';
+                                    glow.style.left = (x - 30) + 'px';
+                                    glow.style.top = (y - 30) + 'px';
+                                    doc.body.appendChild(glow);
+                                    
+                                    // Center dot
+                                    var dot = doc.createElement('div');
+                                    dot.style.cssText = 'position:absolute; pointer-events:none; z-index:100001; border-radius:50%; width:8px; height:8px; background:#fff; box-shadow:0 0 6px rgba(0,0,0,0.5);';
+                                    dot.style.left = (x - 4) + 'px';
+                                    dot.style.top = (y - 4) + 'px';
+                                    doc.body.appendChild(dot);
+                                });
+                                
+                            } catch(e) {
+                                console.log('Heatmap render error:', e);
+                            }
+                        };
+                    </script>
+                </body>
+                </html>
+                <?php
+                exit;
+            }
+        }
 
         if ($tab === 'stats') {
 
@@ -394,13 +500,40 @@ if (file_exists($db_file)) {
             $stmt->execute($params);
             $today_visits = $stmt->fetchColumn();
 
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM visits WHERE $where_sql AND is_bounced = 1");
+            $stmt->execute($params);
+            $bounced_visits = $stmt->fetchColumn();
+            $bounce_rate = $total_visits > 0 ? round(($bounced_visits / $total_visits) * 100) : 0;
+
             $stmt = $pdo->prepare("SELECT utm_source, COUNT(*) as c FROM visits WHERE $where_sql AND utm_source != '' GROUP BY utm_source ORDER BY c DESC LIMIT 5");
             $stmt->execute($params);
             $top_sources = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $stmt = $pdo->prepare("SELECT * FROM visits WHERE $where_sql ORDER BY created_at DESC LIMIT 500");
+            $page = isset($_GET['p']) ? max(1, intval($_GET['p'])) : 1;
+            $per_page = 50;
+            $offset = ($page - 1) * $per_page;
+
+            $stmt = $pdo->prepare("SELECT * FROM visits WHERE $where_sql ORDER BY created_at DESC LIMIT $per_page OFFSET $offset");
             $stmt->execute($params);
             $recent_visits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $total_pages = $total_visits > 0 ? ceil($total_visits / $per_page) : 1;
+
+            // Sessions map for heatmap
+            $sessions_map = [];
+            $aggregate_clicks = [];
+            if (!empty($recent_visits)) {
+                try {
+                    $visit_ids = array_column($recent_visits, 'id');
+                    $placeholders = implode(',', array_fill(0, count($visit_ids), '?'));
+                    $stmt_s = $pdo->prepare("SELECT visit_id, clicks, max_scroll, duration FROM sessions WHERE visit_id IN ($placeholders)");
+                    $stmt_s->execute($visit_ids);
+                    while ($row = $stmt_s->fetch(PDO::FETCH_ASSOC)) {
+                        $sessions_map[$row['visit_id']] = $row;
+                        $c = json_decode($row['clicks'], true);
+                        if (is_array($c)) $aggregate_clicks = array_merge($aggregate_clicks, $c);
+                    }
+                } catch (Exception $e) {}
+            }
 
             if ($total_visits > 0) {
                 $mobile_count = 0;
@@ -632,7 +765,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                     </div>
                 </form>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
                         <div>
                             <p class="text-gray-500 text-sm font-medium mb-1"><?= __('visits_period') ?></p>
@@ -672,6 +805,17 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                             <div class="bg-indigo-500 h-2 rounded-full" style="width: <?= $mobile_pct ?>%"></div>
                         </div>
                         <p class="text-[10px] text-gray-400"><?= __('touch_devices') ?></p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-center">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-gray-500 text-sm font-medium"><?= $lang === 'fa' ? 'نرخ پرش' : 'Bounce Rate' ?></p>
+                            <h3 class="text-2xl font-black text-gray-800" dir="ltr">%<?= $bounce_rate ?></h3>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2 mb-2">
+                            <div class="<?= $bounce_rate > 70 ? 'bg-red-500' : ($bounce_rate > 40 ? 'bg-yellow-500' : 'bg-green-500') ?> h-2 rounded-full" style="width: <?= $bounce_rate ?>%"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-400"><?= $lang === 'fa' ? 'خروج زیر ۴ ثانیه' : 'Left under 4s' ?></p>
                     </div>
                 </div>
 
@@ -719,6 +863,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                                         <th class="py-3 px-4 text-gray-500 font-medium whitespace-nowrap"><?= __('col_referrer') ?></th>
                                         <th class="py-3 px-4 text-gray-500 font-medium whitespace-nowrap"><?= __('col_device') ?></th>
                                         <th class="py-3 px-4 text-gray-500 font-medium whitespace-nowrap"><?= __('col_ip') ?></th>
+                                        <th class="py-3 px-4 text-gray-500 font-medium whitespace-nowrap text-center">🎬</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
@@ -756,18 +901,62 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                                                 </div>
                                             </td>
                                             <td class="py-3 px-4 text-gray-400 font-mono text-xs" dir="ltr"><?= htmlspecialchars($v['ip']) ?></td>
+                                            <td class="py-3 px-4 text-center">
+                                                <?php if (isset($sessions_map[$v['id']])): ?>
+                                                    <a
+                                                        href="?heatmap_view=<?= $v['id'] ?>"
+                                                        target="_blank"
+                                                        title="<?= $lang === 'fa' ? 'نمایش نقشه کلیک' : 'View Click Heatmap' ?>"
+                                                        class="w-7 h-7 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-600 flex items-center justify-center mx-auto transition-colors text-sm">
+                                                        <i class="fa-solid fa-crosshairs"></i>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <span class="text-gray-200 text-xs">—</span>
+                                                <?php endif; ?>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                     <?php if(empty($recent_visits)): ?>
-                                        <tr><td colspan="5" class="py-8 text-center text-gray-400"><?= __('no_visits') ?></td></tr>
+                                        <tr><td colspan="6" class="py-8 text-center text-gray-400"><?= __('no_visits') ?></td></tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
+                        <?php if (isset($total_pages) && $total_pages > 1): ?>
+                        <div class="p-4 border-t border-gray-100 flex items-center justify-between shrink-0 bg-gray-50/50 rounded-b-2xl">
+                            <span class="text-sm text-gray-500 font-medium">
+                                <?= $lang === 'fa' ? 'صفحه' : 'Page' ?> <b class="text-gray-800"><?= $page ?></b> <?= $lang === 'fa' ? 'از' : 'of' ?> <b class="text-gray-800"><?= $total_pages ?></b>
+                            </span>
+                            <div class="flex gap-1" dir="ltr">
+                                <?php 
+                                    $query_params = $_GET;
+                                    unset($query_params['p']);
+                                    $qs = http_build_query($query_params);
+                                    $qs = $qs ? '?' . $qs . '&' : '?';
+                                ?>
+                                <?php if ($page > 1): ?>
+                                    <a href="<?= $qs ?>p=<?= $page - 1 ?>" class="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-white bg-gray-50 text-sm transition-colors text-gray-600">&laquo;</a>
+                                <?php endif; ?>
+                                
+                                <?php
+                                $start_p = max(1, $page - 2);
+                                $end_p = min($total_pages, $page + 2);
+                                for ($i = $start_p; $i <= $end_p; $i++):
+                                ?>
+                                    <a href="<?= $qs ?>p=<?= $i ?>" class="px-3 py-1.5 border <?= $i === $page ? 'bg-blue-50 text-blue-600 font-bold border-blue-200 shadow-sm' : 'border-gray-200 hover:bg-white bg-gray-50 text-gray-600 transition-colors' ?> text-sm rounded-lg"><?= $i ?></a>
+                                <?php endfor; ?>
+
+                                <?php if ($page < $total_pages): ?>
+                                    <a href="<?= $qs ?>p=<?= $page + 1 ?>" class="px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-white bg-gray-50 text-sm transition-colors text-gray-600">&raquo;</a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
-            <?php elseif ($tab === 'landings'): ?>
+                <?php elseif ($tab === 'landings'): ?>
+
                 <!-- ================= TAB: LANDINGS ================= -->
                 
                 <?php if(isset($create_error)): ?>
@@ -1070,7 +1259,7 @@ $base_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['
                 const originalHtml = btnElement.innerHTML;
                 btnElement.innerHTML = '<i class="fa-solid fa-check"></i>';
                 btnElement.classList.add(isMedia ? 'bg-green-500' : 'bg-green-50', isMedia ? 'text-white' : 'text-green-600');
-                if(!isMedia) btnElement.innerHTML += ' ' + '<?= __(\'copied\') ?>';
+                if(!isMedia) btnElement.innerHTML += ' ' + '<?= __('copied') ?>';
                 
                 setTimeout(() => {
                     btnElement.innerHTML = originalHtml;
